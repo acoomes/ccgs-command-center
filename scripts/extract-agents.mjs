@@ -47,9 +47,12 @@ function detectEngine(claudeMdPath) {
   return 'unity';
 }
 
-const files = fs.readdirSync(AGENTS_DIR)
-  .filter((f) => f.endsWith('.md'))
-  .sort();
+let files = [];
+try {
+  files = fs.readdirSync(AGENTS_DIR).filter((f) => f.endsWith('.md')).sort();
+} catch {
+  // No .claude/agents/ in the parent project — emit an empty roster.
+}
 
 const agents = [];
 const skipped = [];

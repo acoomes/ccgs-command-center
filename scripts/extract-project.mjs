@@ -50,7 +50,7 @@ const reviewMode = (read('production/review-mode.txt') ?? '').trim() || null;
 
 // ── Git ──
 const branch = git('rev-parse --abbrev-ref HEAD');
-const firstCommitTs = Number(git('log --reverse --format=%ct').split('\n')[0]) || null;
+const firstCommitTs = Number((git('log --reverse --format=%ct') ?? '').split('\n')[0]) || null;
 const lastCommitTs  = Number(git('log -1 --format=%ct')) || null;
 const lastCommitSubject = git('log -1 --format=%s');
 const dirtyCount = (git('status --porcelain') ?? '').split('\n').filter(Boolean).length;

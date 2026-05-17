@@ -1,0 +1,8 @@
+node_modules/
+dist/
+tsconfig.tsbuildinfo
+src/data/agents.generated.json
+src/data/project.generated.json
+src/data/skills.generated.json
+src/data/history.generated.json
+src/data/needs.generated.json

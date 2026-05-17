@@ -1,0 +1,32 @@
+{
+  "name": "ccgs-command-center",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "CCGS Command Center — Studio Mode (mid-sprint view). Static React UI built from Claude Design handoff.",
+  "scripts": {
+    "extract-agents": "node scripts/extract-agents.mjs",
+    "extract-project": "node scripts/extract-project.mjs",
+    "extract-skills": "node scripts/extract-skills.mjs",
+    "extract-history": "node scripts/extract-history.mjs",
+    "extract-needs": "node scripts/extract-needs.mjs",
+    "extract": "npm run extract-agents && npm run extract-project && npm run extract-skills && npm run extract-history && npm run extract-needs",
+    "predev": "npm run extract",
+    "prebuild": "npm run extract",
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b --noEmit"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  }
+}

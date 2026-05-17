@@ -22,6 +22,9 @@ cd ccgs-command-center
 `launch.sh preview` builds and serves the production bundle instead. First
 run installs npm deps (~30s); subsequent runs are instant.
 
+If you're in Claude Code, `/command-center` runs the launcher and reports
+the URL back (skill at `.claude/skills/command-center/SKILL.md`).
+
 Point it at your project by either copying the dashboard into your
 project's `tools/` directory, or by editing the `REPO_ROOT` paths at the
 top of each `scripts/extract-*.mjs` to point at the project you want to

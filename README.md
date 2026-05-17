@@ -9,8 +9,6 @@ Read-only. It never modifies your repo.
 
 ![Command Center screenshot](docs/screenshot.png)
 
-> No screenshot yet — drop a PNG at `docs/screenshot.png` and it'll show up here.
-
 ## Quick start
 
 Requires Node.js 20+.

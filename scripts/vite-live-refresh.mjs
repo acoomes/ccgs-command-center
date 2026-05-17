@@ -17,7 +17,9 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname  = path.dirname(fileURLToPath(import.meta.url));
 const TOOL_ROOT  = path.resolve(__dirname, '..');
-const REPO_ROOT  = path.resolve(__dirname, '../../..');
+const REPO_ROOT  = process.env.PROJECT_ROOT
+  ? path.resolve(process.env.PROJECT_ROOT)
+  : path.resolve(__dirname, '../../..');
 
 const ROUTES = [
   { match: /[\\/]\.claude[\\/]agents[\\/].+\.md$/,         extractors: ['agents'] },

@@ -4,9 +4,14 @@
 #   - Re-runs the data extractors (predev hook handles this)
 #   - Starts the Vite dev server and opens it in the browser
 #
-# Usage: ./launch.sh           — dev mode (HMR, fast restart)
-#        ./launch.sh preview   — production build + serve
+# Usage: ./launch.sh                                   — dev mode (HMR), reads <cwd>/../..
+#        ./launch.sh preview                           — production build + serve
+#        PROJECT_ROOT=/path/to/your/project ./launch.sh — point at any project
 set -euo pipefail
+
+if [ -n "${PROJECT_ROOT:-}" ]; then
+  echo "→ PROJECT_ROOT=$PROJECT_ROOT"
+fi
 
 cd "$(dirname "$0")"
 

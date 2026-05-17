@@ -10,7 +10,9 @@ import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = path.resolve(__dirname, '../../..');
+const REPO_ROOT = process.env.PROJECT_ROOT
+  ? path.resolve(process.env.PROJECT_ROOT)
+  : path.resolve(__dirname, '../../..');
 const OUT_FILE  = path.resolve(__dirname, '../src/data/history.generated.json');
 
 const TIMELINE_LIMIT = 14;
@@ -139,7 +141,11 @@ for (const line of auditRaw) {
   if (!m) continue;
   const ts = parseAuditTs(m[1]);
   if (ts == null || ts <= sessionStartTs) continue;
-  sessionEvents.push({ ts, action: m[2], agent: m[3].trim() || '—' });
+  const slug = m[3].trim();
+  // Drop malformed log entries: an empty slug means the hook fired but
+  // failed to capture which agent — rendering "—" cards is just noise.
+  if (!slug) continue;
+  sessionEvents.push({ ts, action: m[2], agent: slug });
 }
 
 const openByAgent = new Map(); // slug → spawn ts

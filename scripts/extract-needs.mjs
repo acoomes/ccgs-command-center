@@ -13,7 +13,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = path.resolve(__dirname, '../../..');
+const REPO_ROOT = process.env.PROJECT_ROOT
+  ? path.resolve(process.env.PROJECT_ROOT)
+  : path.resolve(__dirname, '../../..');
 const OUT_FILE  = path.resolve(__dirname, '../src/data/needs.generated.json');
 
 const read = (rel) => {

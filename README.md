@@ -25,11 +25,23 @@ run installs npm deps (~30s); subsequent runs are instant.
 If you're in Claude Code, `/command-center` runs the launcher and reports
 the URL back (skill at `.claude/skills/command-center/SKILL.md`).
 
-Point it at your project by either copying the dashboard into your
-project's `tools/` directory, or by editing the `REPO_ROOT` paths at the
-top of each `scripts/extract-*.mjs` to point at the project you want to
-inspect. (The default assumes the dashboard lives at
-`<project>/tools/command-center/`.)
+### Pointing it at a project
+
+Two options:
+
+```sh
+# 1. Set PROJECT_ROOT and launch from anywhere
+PROJECT_ROOT=/path/to/your/project ./launch.sh
+
+# 2. Or copy the dashboard into <your-project>/tools/command-center/
+#    and launch it from there — no env var needed (default falls back to
+#    ../../.. relative to the scripts dir)
+cd <your-project>/tools/command-center && ./launch.sh
+```
+
+`PROJECT_ROOT` is read once per extractor invocation, so a fresh dev
+server with a different value gives you a fresh dashboard pointed at a
+different project — handy if you juggle multiple repos.
 
 ## What it shows
 

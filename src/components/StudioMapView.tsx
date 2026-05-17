@@ -2,13 +2,20 @@ import { useState } from 'react';
 import type { CSSProperties, MouseEvent } from 'react';
 import type { AgentState, Wing, Department, WingKey } from '../data/types';
 import { REAL_STUDIO_MAP as STUDIO_MAP } from '../data/realAgents';
+import { LIVE_AGENTS } from '../data/history';
+
+// Live-set overlay. Module-level so the dot helper can read it without
+// prop-threading through WingView → DeptView → spec list.
+const LIVE_SLUGS = new Set(LIVE_AGENTS.map((a) => a.slug));
+const overlay = (slug: string, base: AgentState): AgentState =>
+  LIVE_SLUGS.has(slug) ? 'live' : base;
 
 interface StudioMapProps {
   selectedAgent: string | null;
   onAgent: (key: string, e: MouseEvent) => void;
 }
 
-type Filter = 'all' | 'active' | 'blocked';
+type Filter = 'all' | 'active';
 
 const dotStyle = (state: AgentState, ring = 3): CSSProperties => {
   const liveShadow = `0 0 0 ${ring}px rgba(127, 184, 176, 0.18)`;
@@ -32,30 +39,28 @@ export function StudioMapView({ selectedAgent, onAgent }: StudioMapProps) {
   const [filter, setFilter] = useState<Filter>('all');
   const [query, setQuery] = useState('');
 
-  const matches = (state: AgentState, name: string) => {
-    if (filter === 'active' && state !== 'live' && state !== 'hot') return false;
-    if (filter === 'blocked' && state !== 'hot' && state !== 'warn') return false;
+  const matches = (_state: AgentState, name: string) => {
+    if (filter === 'active' && !LIVE_SLUGS.has(name)) return false;
     if (query && !name.toLowerCase().includes(query.toLowerCase())) return false;
     return true;
   };
 
-  // Counts for toolbar
-  let total = 0, active = 0, blocked = 0;
+  // Counts for toolbar. `total` is the size of the org we render; `active`
+  // is the intersection between the org and the live set so the badge can't
+  // claim more active agents than the map can actually surface.
+  let total = 0, active = 0;
   Object.values(STUDIO_MAP).forEach((wing) => {
     total++;
-    if (wing.dirState === 'live') active++;
-    if (wing.dirState === 'hot' || wing.dirState === 'warn') blocked++;
+    if (LIVE_SLUGS.has(wing.director)) active++;
     wing.departments.forEach((dept) => {
       if (dept.lead) {
         total++;
-        if (dept.leadState === 'live') active++;
-        if (dept.leadState === 'hot' || dept.leadState === 'warn') blocked++;
+        if (LIVE_SLUGS.has(dept.lead)) active++;
       }
-      dept.specs.forEach(([, state]) => {
+      dept.specs.forEach(([slug, state]) => {
         if (state === 'dim') return;
         total++;
-        if (state === 'live') active++;
-        if (state === 'hot' || state === 'warn') blocked++;
+        if (LIVE_SLUGS.has(slug)) active++;
       });
     });
   });
@@ -70,11 +75,7 @@ export function StudioMapView({ selectedAgent, onAgent }: StudioMapProps) {
           </button>
           <button className={filter === 'active' ? 'active' : ''}
                   onClick={(e) => { e.stopPropagation(); setFilter('active'); }}>
-            Active · {active}
-          </button>
-          <button className={filter === 'blocked' ? 'active' : ''}
-                  onClick={(e) => { e.stopPropagation(); setFilter('blocked'); }}>
-            Needs attention · {blocked}
+            Live · {active}
           </button>
         </div>
         <div className="hf-input" style={{ flex: '0 1 240px', padding: '4px 10px' }}>
@@ -92,9 +93,7 @@ export function StudioMapView({ selectedAgent, onAgent }: StudioMapProps) {
           )}
         </div>
         <span className="row gap10 small muted" style={{ marginLeft: 'auto' }}>
-          <span className="row gap4 baseline"><span className="hf-dot live" />active</span>
-          <span className="row gap4 baseline"><span className="hf-dot warn" />waiting</span>
-          <span className="row gap4 baseline"><span className="hf-dot hot" />blocked</span>
+          <span className="row gap4 baseline"><span className="hf-dot live" />live</span>
           <span className="row gap4 baseline"><span className="hf-dot idle" />idle</span>
         </span>
       </div>
@@ -163,7 +162,7 @@ function WingView({ wingKey, wing, filter, query, matches, selectedAgent, onAgen
         >
           {wing.director}
         </span>
-        <span className="hf-dot" style={dotStyle(wing.dirState)} />
+        <span className="hf-dot" style={dotStyle(overlay(wing.director, wing.dirState))} />
         <span className="role">opus</span>
         <div className="right">
           <span>{wing.departments.length} depts</span>
@@ -224,7 +223,7 @@ function DeptCard({ data, showAll, selectedAgent, onAgent }: DeptCardProps) {
             onClick={(e) => dept.leadKey && (e.stopPropagation(), onAgent(dept.leadKey, e))}
             style={{ cursor: dept.leadKey ? 'pointer' : 'default' }}
           >
-            <span className="hf-dot" style={dotStyle(dept.leadState ?? 'idle')} />
+            <span className="hf-dot" style={dotStyle(overlay(dept.lead, dept.leadState ?? 'idle'))} />
             <span className="role">{dept.lead}</span>
             <span className="badge">lead</span>
           </div>
@@ -247,7 +246,7 @@ function DeptCard({ data, showAll, selectedAgent, onAgent }: DeptCardProps) {
                   onClick={(e) => k && (e.stopPropagation(), onAgent(k, e))}
                   style={{ cursor: k ? 'pointer' : 'default' }}
                 >
-                  <span className="hf-dot" style={dotStyle(state, 2)} />
+                  <span className="hf-dot" style={dotStyle(overlay(name, state), 2)} />
                   <span className="name">{name}</span>
                   {state === 'hot' && (
                     <span className="hf-chip hot" style={{ fontSize: 9, padding: '0 5px' }}>blocked</span>

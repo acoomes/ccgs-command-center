@@ -10,7 +10,12 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname  = path.dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT  = path.resolve(__dirname, '../../..');
+// PROJECT_ROOT env var lets the dashboard be launched from anywhere and
+// pointed at any project. Default falls back to `<script>/../../..` which
+// matches the "deployed at <project>/tools/command-center/" layout.
+const REPO_ROOT  = process.env.PROJECT_ROOT
+  ? path.resolve(process.env.PROJECT_ROOT)
+  : path.resolve(__dirname, '../../..');
 const AGENTS_DIR = path.join(REPO_ROOT, '.claude/agents');
 const CLAUDE_MD  = path.join(REPO_ROOT, 'CLAUDE.md');
 const OUT_FILE   = path.resolve(__dirname, '../src/data/agents.generated.json');

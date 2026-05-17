@@ -152,10 +152,6 @@ function LiveView({ live, recentStops, onAgent, onRunSkill }: {
           {recentStops.map((s) => <StoppedAgentCard key={`${s.slug}-${s.stoppedAtSec}`} stop={s} />)}
         </div>
       )}
-      <div className="tiny muted" style={{ marginTop: 4 }}>
-        Caller hierarchy isn't captured in the audit log, so this is a flat
-        live list — not a tree.
-      </div>
     </div>
   );
 }
